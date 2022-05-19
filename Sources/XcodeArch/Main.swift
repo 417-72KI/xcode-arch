@@ -20,7 +20,7 @@ struct XcodeArchMain: AsyncParsableCommand {
 extension XcodeArchMain {
     static var configuration: CommandConfiguration {
         .init(commandName: "xcode-arch",
-              abstract: "A utility to switch architecture of Xcode.",
+              abstract: "A utility to switch running architecture of Xcode on M1 mac.",
               usage: "xcode-arch [options]",
               discussion: """
                 To check/uncheck 'Open Using Rosetta' is bothering.
