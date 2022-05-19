@@ -6,9 +6,10 @@ enum XcodeArch {
         let xcodePath = try await getCurrentXcodePath()
         print(xcodePath)
         let archs = try await getLaunchServicesPlist()
-        archs.forEach { data, _ in
-            print(getResolvedAliasPathInData(data) ?? "")
-        }
+        let arch = (archs.first(where: { $0.path == xcodePath })?.arch)
+            .flatMap(Architecture.init(rawValue:)) ?? .arm64
+
+        print("\u{001B}[0;32m`\(xcodePath)` is running with \(arch)\u{001B}[0;m")
     }
 
     static func switchArch(_ arch: Architecture) async throws {
@@ -34,7 +35,7 @@ private extension XcodeArch {
         return developerDir.replacingOccurrences(of: "/Contents/Developer", with: "")
     }
 
-    static func getLaunchServicesPlist() async throws -> [(Data, String)] {
+    static func getLaunchServicesPlist() async throws -> [(path: String, arch: String)] {
         let fm = FileManager.default
         let plistUrl = fm.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Preferences/com.apple.LaunchServices/com.apple.LaunchServices.plist")
@@ -45,11 +46,12 @@ private extension XcodeArch {
             return []
         }
         guard xcodeArchs.count % 2 == 0 else { throw XcodeArchError.invalidPlist }
-        var result: [(Data, String)] = []
+        var result: [(String, String)] = []
         for i in (0 ..< xcodeArchs.count / 2) {
             guard let data = xcodeArchs[i * 2] as? Data,
                   let arch = xcodeArchs[i * 2 + 1] as? String else { continue }
-            result.append((data, arch))
+            guard let path = getResolvedAliasPathInData(data) else { continue }
+            result.append((path, arch))
         }
         return result
     }
