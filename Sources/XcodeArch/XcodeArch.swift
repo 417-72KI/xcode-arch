@@ -5,6 +5,10 @@ enum XcodeArch {
     static func printCurrent() async throws {
         let xcodePath = try await getCurrentXcodePath()
         print(xcodePath)
+        let archs = try await getLaunchServicesPlist()
+        archs.forEach { data, _ in
+            print(getResolvedAliasPathInData(data) ?? "")
+        }
     }
 
     static func switchArch(_ arch: Architecture) async throws {
@@ -29,6 +33,26 @@ private extension XcodeArch {
               developerDir.hasSuffix("/Contents/Developer") else { throw XcodeArchError.unknownXcodePath }
         return developerDir.replacingOccurrences(of: "/Contents/Developer", with: "")
     }
+
+    static func getLaunchServicesPlist() async throws -> [(Data, String)] {
+        let fm = FileManager.default
+        let plistUrl = fm.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Preferences/com.apple.LaunchServices/com.apple.LaunchServices.plist")
+        guard fm.fileExists(atPath: plistUrl.path) else { throw XcodeArchError.launchServicesPlistNotFound }
+        guard let plist = try PropertyListSerialization.propertyList(from: Data(contentsOf: plistUrl), format: nil) as? [String: [String: [Any]]],
+              let archs = plist["Architectures for arm64"] else { throw XcodeArchError.invalidPlist }
+        guard let xcodeArchs = archs["com.apple.dt.Xcode"] else {
+            return []
+        }
+        guard xcodeArchs.count % 2 == 0 else { throw XcodeArchError.invalidPlist }
+        var result: [(Data, String)] = []
+        for i in (0 ..< xcodeArchs.count / 2) {
+            guard let data = xcodeArchs[i * 2] as? Data,
+                  let arch = xcodeArchs[i * 2 + 1] as? String else { continue }
+            result.append((data, arch))
+        }
+        return result
+    }
 }
 
 enum Architecture: String, CaseIterable {
@@ -38,4 +62,6 @@ enum Architecture: String, CaseIterable {
 
 enum XcodeArchError: Error {
     case unknownXcodePath
+    case launchServicesPlistNotFound
+    case invalidPlist
 }
