@@ -2,6 +2,8 @@ import Foundation
 import LaunchServices
 
 enum XcodeArch {
+    static var shellRunner: ShellRunner.Type = DefaultShellRunner.self
+
     static func printCurrent() async throws {
         let xcodePath = try await getCurrentXcodePath()
         print(xcodePath)
@@ -17,29 +19,27 @@ enum XcodeArch {
         _LSSetArchitecturePreferenceForApplicationURL(URL(fileURLWithPath: xcodePath), arch.rawValue)
 
         print("\u{001B}[0;32mSet \(arch) for \(xcodePath)\u{001B}[0;m")
+
+        try await killXcode()
     }
 }
 
 private extension XcodeArch {
     static func getCurrentXcodePath() async throws -> String {
-        let process = Process()
-        process.launchPath = "/usr/bin/xcode-select"
-        process.arguments = ["-p"]
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        try process.run()
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        guard let developerDir = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .newlines),
+        guard let developerDir = try shellRunner.run("/usr/bin/xcode-select", with: ["-p"]).stringOutput,
               developerDir.hasSuffix("/Contents/Developer") else { throw XcodeArchError.unknownXcodePath }
         return developerDir.replacingOccurrences(of: "/Contents/Developer", with: "")
+    }
+
+    static func killXcode() async throws {
+        try shellRunner.run("/usr/bin/killall", with: ["Xcode"])
     }
 
     static func getLaunchServicesPlist() async throws -> [(path: String, arch: String)] {
         let fm = FileManager.default
         let plistUrl = fm.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Preferences/com.apple.LaunchServices/com.apple.LaunchServices.plist")
-        guard fm.fileExists(atPath: plistUrl.path) else { throw XcodeArchError.launchServicesPlistNotFound }
+        guard fm.fileExists(atPath: plistUrl.path) else { throw XcodeArchError.launchServicesPlistNotFound(plistUrl) }
         guard let plist = try PropertyListSerialization.propertyList(from: Data(contentsOf: plistUrl), format: nil) as? [String: [String: [Any]]],
               let archs = plist["Architectures for arm64"] else { throw XcodeArchError.invalidPlist }
         guard let xcodeArchs = archs["com.apple.dt.Xcode"] else {
@@ -69,7 +69,26 @@ enum Architecture: String, CaseIterable {
 }
 
 enum XcodeArchError: Error {
+    case runningInX86_64
+    case invalidArchitecture(String)
     case unknownXcodePath
-    case launchServicesPlistNotFound
+    case launchServicesPlistNotFound(URL)
     case invalidPlist
+}
+
+extension XcodeArchError: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .runningInX86_64:
+            return "Running in `x86_64` arch. This tool supports only `arm64`"
+        case let .invalidArchitecture(actual):
+            return "Invalid architecture: \(actual)"
+        case .unknownXcodePath:
+            return "Xcode is not installed"
+        case let .launchServicesPlistNotFound(expected):
+            return "\(expected) not found."
+        case .invalidPlist:
+            return "Invalid plist"
+        }
+    }
 }

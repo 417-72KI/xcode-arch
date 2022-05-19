@@ -32,6 +32,8 @@ extension XcodeArchMain {
 
 extension XcodeArchMain {
     func run() async throws {
+        try validateMachine()
+
         if printCurrentArch {
             try await XcodeArch.printCurrent()
             return
@@ -53,6 +55,18 @@ extension XcodeArchMain {
         }
 
         throw CleanExit.helpRequest(self)
+    }
+}
+
+private extension XcodeArchMain {
+    func validateMachine() throws {
+        let machineArch = try DefaultShellRunner.run("/usr/bin/uname", with: ["-m"]).stringOutput
+        guard let machineArch = machineArch.flatMap(Architecture.init(rawValue:)) else {
+            throw XcodeArchError.invalidArchitecture(String(describing: machineArch))
+        }
+        if case .x86_64 = machineArch {
+            throw XcodeArchError.runningInX86_64
+        }
     }
 }
 
