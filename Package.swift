@@ -18,8 +18,11 @@ let package = Package(
         .executableTarget(
             name: "XcodeArch",
             dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                "LaunchServices"
             ]),
+        .target(name: "LaunchServices",
+                publicHeadersPath: "include"),
         .testTarget(
             name: "XcodeArchTests",
             dependencies: ["XcodeArch"]),
