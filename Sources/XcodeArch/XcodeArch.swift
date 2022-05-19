@@ -6,7 +6,6 @@ enum XcodeArch {
 
     static func printCurrent() async throws {
         let xcodePath = try await getCurrentXcodePath()
-        print(xcodePath)
         let archs = try await getLaunchServicesPlist()
         let arch = (archs.first(where: { $0.path == xcodePath })?.arch)
             .flatMap(Architecture.init(rawValue:)) ?? .arm64
