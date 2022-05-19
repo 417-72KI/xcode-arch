@@ -24,7 +24,7 @@ extension XcodeArchMain {
               usage: "xcode-arch [options]",
               discussion: """
                 To check/uncheck 'Open Using Rosetta' is bothering.
-                This tool can switch `checked/unchecked` easily.
+                This tool makes switching `checked/unchecked` easily.
                 """,
               version: "1.0.0")
     }
