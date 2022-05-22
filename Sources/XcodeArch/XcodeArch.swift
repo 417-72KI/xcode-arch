@@ -1,5 +1,5 @@
 import Foundation
-import LaunchServices
+import ObjCBridge
 
 enum XcodeArch {
     static var shellRunner: ShellRunner.Type = DefaultShellRunner.self
