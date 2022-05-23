@@ -1,6 +1,6 @@
 import Foundation
 
-enum XcodeArchError: Error {
+public enum XcodeArchError: Error {
     case runningInX86_64
     case invalidArchitecture(String)
     case unknownXcodePath
@@ -8,8 +8,9 @@ enum XcodeArchError: Error {
     case invalidPlist
 }
 
+// MARK: - CustomStringConvertible
 extension XcodeArchError: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         switch self {
         case .runningInX86_64:
             return "Running in `x86_64` arch. This tool supports only `arm64`"

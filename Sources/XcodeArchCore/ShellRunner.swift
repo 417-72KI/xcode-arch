@@ -1,21 +1,21 @@
 import Foundation
 
-protocol ShellRunner {
+public protocol ShellRunner {
     @discardableResult
     static func run(_ launchPath: String,
                     with arguments: [String]) throws -> Pipe
 }
 
-extension ShellRunner {
+public extension ShellRunner {
     @discardableResult
     static func run(_ launchPath: String) throws -> Pipe {
         try run(launchPath, with: [])
     }
 }
 
-struct DefaultShellRunner: ShellRunner {
+public struct DefaultShellRunner: ShellRunner {
     @discardableResult
-    static func run(_ launchPath: String,
+    public static func run(_ launchPath: String,
                     with arguments: [String]) throws -> Pipe {
         let process = Process()
         process.launchPath = launchPath
@@ -30,7 +30,7 @@ struct DefaultShellRunner: ShellRunner {
     }
 }
 
-extension Pipe {
+public extension Pipe {
     var stringOutput: String? {
         let data = fileHandleForReading.readDataToEndOfFile()
         return String(data: data, encoding: .utf8)?

@@ -19,8 +19,10 @@ let package = Package(
             name: "XcodeArch",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                "ObjCBridge"
+                "XcodeArchCore"
             ]),
+        .target(name: "XcodeArchCore",
+                dependencies: ["ObjCBridge"]),
         .target(name: "ObjCBridge",
                 publicHeadersPath: "include"),
         .testTarget(

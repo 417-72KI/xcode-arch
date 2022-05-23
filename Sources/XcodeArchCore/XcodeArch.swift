@@ -1,9 +1,11 @@
 import Foundation
 import ObjCBridge
 
-enum XcodeArch {
+public enum XcodeArch {
     static var shellRunner: ShellRunner.Type = DefaultShellRunner.self
+}
 
+public extension XcodeArch {
     static func printCurrent() async throws {
         let xcodePath = try await getCurrentXcodePath()
         let archs = try await getLaunchServicesPlist()
@@ -23,7 +25,7 @@ enum XcodeArch {
     }
 }
 
-private extension XcodeArch {
+extension XcodeArch {
     static func getCurrentXcodePath() async throws -> String {
         guard let developerDir = try shellRunner.run("/usr/bin/xcode-select", with: ["-p"]).stringOutput,
               developerDir.hasSuffix("/Contents/Developer") else { throw XcodeArchError.unknownXcodePath }

@@ -1,4 +1,5 @@
 import ArgumentParser
+import XcodeArchCore
 
 @main
 struct XcodeArchMain: AsyncParsableCommand {
@@ -71,6 +72,6 @@ private extension XcodeArchMain {
 }
 
 // MARK: -
-extension Architecture:ExpressibleByArgument {
+extension Architecture: ExpressibleByArgument {
 }
 
