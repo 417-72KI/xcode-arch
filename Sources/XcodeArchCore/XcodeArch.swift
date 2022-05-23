@@ -36,11 +36,10 @@ extension XcodeArch {
         try shellRunner.run("/usr/bin/killall", with: ["Xcode"])
     }
 
-    static func getLaunchServicesPlist() async throws -> [(path: String, arch: String)] {
-        let fm = FileManager.default
-        let plistUrl = fm.homeDirectoryForCurrentUser
+    static func getLaunchServicesPlist(_ fileManager: FileManager = .default) async throws -> [(path: String, arch: String)] {
+        let plistUrl = fileManager.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Preferences/com.apple.LaunchServices/com.apple.LaunchServices.plist")
-        guard fm.fileExists(atPath: plistUrl.path) else { throw XcodeArchError.launchServicesPlistNotFound(plistUrl) }
+        guard fileManager.fileExists(atPath: plistUrl.path) else { throw XcodeArchError.launchServicesPlistNotFound(plistUrl) }
         guard let plist = try PropertyListSerialization.propertyList(from: Data(contentsOf: plistUrl), format: nil) as? [String: [String: [Any]]],
               let archs = plist["Architectures for arm64"] else { throw XcodeArchError.invalidPlist }
         guard let xcodeArchs = archs["com.apple.dt.Xcode"] else {

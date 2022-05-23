@@ -26,7 +26,7 @@ let package = Package(
         .target(name: "ObjCBridge",
                 publicHeadersPath: "include"),
         .testTarget(
-            name: "XcodeArchTests",
-            dependencies: ["XcodeArch"]),
+            name: "XcodeArchCoreTests",
+            dependencies: ["XcodeArchCore"]),
     ]
 )
