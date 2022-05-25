@@ -17,8 +17,7 @@ public extension XcodeArch {
 
     static func switchArch(_ arch: Architecture) async throws {
         let xcodePath = try await getCurrentXcodePath()
-        _LSSetArchitecturePreferenceForApplicationURL(URL(fileURLWithPath: xcodePath), arch.rawValue)
-
+        LSSetArchitecturePreferenceForApplicationURL(URL(fileURLWithPath: xcodePath), arch.rawValue)
         print("\u{001B}[0;32mSet \(arch) for \(xcodePath)\u{001B}[0;m")
 
         try await killXcode()
