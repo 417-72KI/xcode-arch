@@ -12,7 +12,15 @@ Currently, there is no way to toggle `Open using Rosetta` option other than in F
 This provides a command-line tool to set on/off or toggle `Open using Rosetta` option.
 
 ## Installation
-TBD
+### Homebrew(recommended)
+```sh
+brew install 417-72KI/tap/xcode-arch
+```
+
+### Mint
+```sh
+mint install 417-72KI/xcode-arch@0.0.1
+```
 
 ## Usage
 
