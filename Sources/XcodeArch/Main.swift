@@ -16,6 +16,15 @@ struct XcodeArchMain: AsyncParsableCommand {
 
     @Flag(name: .shortAndLong, help: "set `\(Architecture.arm64)` for Xcode")
     var uncheckRosetta = false
+
+    @Flag(name: .shortAndLong, help: "Kill running Xcode")
+    var kill = false
+
+    @Flag(name: .shortAndLong, help: "Launch Xcode with set architecture")
+    var launch = false
+
+    @Flag(name: .shortAndLong, help: "An alias to make both `kill` and `launch` flags on")
+    var relaunch = false
 }
 
 extension XcodeArchMain {
@@ -40,18 +49,20 @@ extension XcodeArchMain {
             return
         }
 
+        let killAndLaunch = relaunch ? (true, true) : (kill, launch)
+
         if let newArch = newArch {
-            try await XcodeArch.switchArch(newArch)
+            try await XcodeArch.switchArch(newArch, and: killAndLaunch)
             return
         }
 
         if checkRosetta {
-            try await XcodeArch.switchArch(.x86_64)
+            try await XcodeArch.switchArch(.x86_64, and: killAndLaunch)
             return
         }
 
         if uncheckRosetta {
-            try await XcodeArch.switchArch(.arm64)
+            try await XcodeArch.switchArch(.arm64, and: killAndLaunch)
             return
         }
 
