@@ -3,18 +3,18 @@ import XcodeArchCore
 
 @main
 struct XcodeArchMain: AsyncParsableCommand {
-    @Flag(name: .shortAndLong, help: "print current architecture of Xcode")
+    @Flag(name: .shortAndLong, help: "Print current architecture of Xcode")
     var printCurrentArch = false
 
     @Option(name: [.customLong("switch"), .customShort("s")],
             parsing: .next,
-            help: ArgumentHelp("set the architecture for Xcode (\(Architecture.allValueStrings.joined(separator: "|")))", valueName: "architecture"))
+            help: ArgumentHelp("Set the architecture for Xcode (\(Architecture.allValueStrings.joined(separator: "|")))", valueName: "architecture"))
     var newArch: Architecture?
 
-    @Flag(name: .shortAndLong, help: "set `\(Architecture.x86_64)` for Xcode")
+    @Flag(name: .shortAndLong, help: "Set `\(Architecture.x86_64)` for Xcode")
     var checkRosetta = false
 
-    @Flag(name: .shortAndLong, help: "set `\(Architecture.arm64)` for Xcode")
+    @Flag(name: .shortAndLong, help: "Set `\(Architecture.arm64)` for Xcode")
     var uncheckRosetta = false
 
     @Flag(name: .shortAndLong, help: "Kill running Xcode")
