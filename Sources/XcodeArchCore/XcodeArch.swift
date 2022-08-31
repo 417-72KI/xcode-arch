@@ -31,6 +31,14 @@ extension XcodeArch {
         return developerDir.replacingOccurrences(of: "/Contents/Developer", with: "")
     }
 
+    static func launchXcode() async throws {
+        try await launchXcode(withPath: getCurrentXcodePath())
+    }
+
+    static func launchXcode(withPath path: String) async throws {
+        try shellRunner.run("/usr/bin/open", with: [path])
+    }
+
     static func killXcode() async throws {
         try shellRunner.run("/usr/bin/killall", with: ["Xcode"])
     }
