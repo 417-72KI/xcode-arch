@@ -15,12 +15,20 @@ public extension XcodeArch {
         print("\u{001B}[0;32m`\(xcodePath)` is running with \(arch)\u{001B}[0;m")
     }
 
-    static func switchArch(_ arch: Architecture) async throws {
+    static func switchArch(
+        _ arch: Architecture,
+        and postExecution: (kill: Bool, launch: Bool)
+    ) async throws {
         let xcodePath = try await getCurrentXcodePath()
         LSSetArchitecturePreferenceForApplicationURL(URL(fileURLWithPath: xcodePath), arch.rawValue)
         print("\u{001B}[0;32mSet \(arch) for \(xcodePath)\u{001B}[0;m")
 
-        try await killXcode()
+        if postExecution.kill {
+            try await killXcode()
+        }
+        if postExecution.launch {
+            try await launchXcode(withPath: xcodePath)
+        }
     }
 }
 
@@ -31,8 +39,18 @@ extension XcodeArch {
         return developerDir.replacingOccurrences(of: "/Contents/Developer", with: "")
     }
 
+    static func launchXcode() async throws {
+        try await launchXcode(withPath: getCurrentXcodePath())
+    }
+
+    static func launchXcode(withPath path: String) async throws {
+        try shellRunner.run("/usr/bin/open", with: [path])
+    }
+
     static func killXcode() async throws {
         try shellRunner.run("/usr/bin/killall", with: ["Xcode"])
+        // Wait for killing Xcode
+        try await Task.sleep(nanoseconds: 5_000_000)
     }
 
     static func getLaunchServicesPlist(_ fileManager: FileManager = .default) async throws -> [(path: String, arch: String)] {
