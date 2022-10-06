@@ -49,6 +49,8 @@ extension XcodeArch {
 
     static func killXcode() async throws {
         try shellRunner.run("/usr/bin/killall", with: ["Xcode"])
+        // Wait for killing Xcode
+        try await Task.sleep(nanoseconds: 5_000_000)
     }
 
     static func getLaunchServicesPlist(_ fileManager: FileManager = .default) async throws -> [(path: String, arch: String)] {
