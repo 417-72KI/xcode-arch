@@ -49,15 +49,18 @@ extension XcodeArch {
         for i in (0 ..< xcodeArchs.count / 2) {
             guard let data = xcodeArchs[i * 2] as? Data,
                   let arch = xcodeArchs[i * 2 + 1] as? String else { continue }
-            let path = getResolvedAliasPath(in: data)
+            guard let path = getResolvedAliasPath(in: data) else {
+                // Removed Xcode
+                continue
+            }
             result.append((path, arch))
         }
         return result
     }
 
-    static func getResolvedAliasPath(in data: Data) -> String {
-        let url = CFURLCreateByResolvingBookmarkData(nil, data as CFData, [], nil, nil, nil, nil)
-            .takeRetainedValue() as URL
+    static func getResolvedAliasPath(in data: Data) -> String? {
+        guard let cfurl = CFURLCreateByResolvingBookmarkData(nil, data as CFData, [], nil, nil, nil, nil) else { return nil }
+        let url = cfurl.takeRetainedValue() as URL
         return url.path
     }
 }
