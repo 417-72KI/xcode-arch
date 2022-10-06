@@ -29,7 +29,7 @@ fi
 cd $(git rev-parse --show-toplevel)
 
 # Version
-TAG=$(swift run ssgh --version 2>/dev/null)
+TAG=$(swift run $EXECUTABLE_NAME --version 2>/dev/null)
 if [ "$(git tag | grep -E "^${TAG}$")" != '' ]; then
     echo "\e[31mTag: '${TAG}' already exists.\e[m"
     exit 1
