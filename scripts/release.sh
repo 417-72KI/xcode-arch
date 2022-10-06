@@ -40,4 +40,4 @@ git commit -m "Bump version to ${TAG}" "${APPLICATION_INFO_FILE_PATH}"
 git push origin main
 
 # Release
-gh release create ${TAG}
+gh release create ${TAG} --generate-notes
