@@ -30,6 +30,18 @@ public extension XcodeArch {
             try await launchXcode(withPath: xcodePath)
         }
     }
+
+    static func validateXcodeVersion() async throws -> Bool {
+        let xcodeVersion = try await getCurrentXcodeVersion()
+        if xcodeVersion >= .init(14, 3, 0) {
+            print("""
+                \u{001B}[0;33m[WARN] Xcode no longer supports Rosetta since 14.3 and current version is \(xcodeVersion.description.replacingOccurrences(of: ".0", with: "")).
+                This tool will be EOL when Xcode 14.3 is required for submission to the App Store.\u{001B}[0;m
+                """)
+            return false
+        }
+        return true
+    }
 }
 
 extension XcodeArch {
@@ -37,6 +49,18 @@ extension XcodeArch {
         guard let developerDir = try shellRunner.run("/usr/bin/xcode-select", with: ["-p"]).stringOutput,
               developerDir.hasSuffix("/Contents/Developer") else { throw XcodeArchError.unknownXcodePath }
         return developerDir.replacingOccurrences(of: "/Contents/Developer", with: "")
+    }
+
+    static func getCurrentXcodeVersion() async throws -> Version {
+        guard let versionInfo = try shellRunner.run("/usr/bin/xcodebuild",
+                                                    with: ["-version"])
+            .stringOutput,
+              let version = versionInfo
+            .split(separator: "\n")
+            .first?
+            .split(separator: " ")
+            .last else { throw XcodeArchError.unknownXcodePath }
+        return Version(version)
     }
 
     static func launchXcode() async throws {
