@@ -44,6 +44,10 @@ extension XcodeArchMain {
     func run() async throws {
         try validateMachine()
 
+        guard try await XcodeArch.validateXcodeVersion() else {
+            return
+        }
+
         if printCurrentArch {
             try await XcodeArch.printCurrent()
             return

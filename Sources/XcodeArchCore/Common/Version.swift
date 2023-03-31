@@ -41,6 +41,10 @@ public extension Version {
     init(_ string: String) {
         self.init(stringLiteral: string)
     }
+
+    init(_ string: any StringProtocol) {
+        self.init(String(string))
+    }
 }
 
 // MARK: - Public properties
