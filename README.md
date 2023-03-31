@@ -2,6 +2,14 @@
 
 A utility to switch running architecture of Xcode on M1 mac.
 
+> **Warning**
+>
+> Xcode is no longer supported under Rosetta since 14.3 and this tool will come to EOL.
+>
+> Also, this tool will do nothing with Xcode 14.3.
+>
+> See: https://developer.apple.com/documentation/xcode-release-notes/xcode-14_3-release-notes#Deprecations
+
 ## Motivation
 Currently, there is no way to toggle `Open using Rosetta` option other than in Finder.
 
@@ -19,7 +27,7 @@ brew install 417-72KI/tap/xcode-arch
 
 ### Mint
 ```sh
-mint install 417-72KI/xcode-arch@0.0.1
+mint install 417-72KI/xcode-arch@0.1.0
 ```
 
 ## Usage
