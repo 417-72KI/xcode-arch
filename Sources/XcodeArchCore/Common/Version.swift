@@ -42,9 +42,15 @@ public extension Version {
         self.init(stringLiteral: string)
     }
 
+    #if swift(>=5.7)
     init(_ string: any StringProtocol) {
         self.init(String(string))
     }
+    #else
+    init(_ string: Substring) {
+        self.init(String(string))
+    }
+    #endif
 }
 
 // MARK: - Public properties
