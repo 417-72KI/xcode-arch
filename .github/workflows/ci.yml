@@ -26,7 +26,7 @@ jobs:
   test:
     name: Test
     needs: xcode-versions
-    runs-on: macos-12
+    runs-on: macos-13
     concurrency: 
       group: ${{ github.head_ref }}-${{ github.workflow }}-${{ matrix.xcode }}-${{ matrix.destination }}
       cancel-in-progress: true
