@@ -2,9 +2,9 @@
 
 A utility to switch running architecture of Xcode on M1 mac.
 
-> **Warning**
+> [!WARNING]
 >
-> Xcode is no longer supported under Rosetta since 14.3 and this tool will come to EOL.
+> This tool is EOL because Xcode is no longer supported under Rosetta since 14.3.
 >
 > Also, this tool will do nothing with Xcode 14.3.
 >
